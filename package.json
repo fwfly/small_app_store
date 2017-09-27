@@ -1,0 +1,19 @@
+{
+  "name": "tools-portal",
+  "private": true,
+  "scripts": {
+    "start": "meteor run"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.23.0",
+    "body-parser": "^1.17.1",
+    "config-js": "^1.1.9",
+    "fibers": "^1.0.15",
+    "material-ui": "^0.17.0",
+    "meteor-node-stubs": "~0.2.0",
+    "react": "^15.4.2",
+    "react-addons-pure-render-mixin": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-tap-event-plugin": "^2.0.1"
+  }
+}
