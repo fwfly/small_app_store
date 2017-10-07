@@ -17,15 +17,16 @@
  *
  *****************************************************************************/ 
 var fs = require('fs');
-import { DirWatchDog } from './dirWatchDog.js'; 
+var os = require("os");
+var homedir = os.homedir();
+
 import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 import { Future } from 'fibers/future';
 import { AppDB }  from '../imports/api/appDB.js';
 
 const testDB = new Mongo.Collection('testdb');
-var repoDir="/home/kenny/jenkins_util_repos";
-
+var repoDir =  homedir + "/jenkins_util_repos";
 
 function IniFileRepo(){
   if(!fs.existsSync(repoDir)) {
@@ -107,7 +108,6 @@ Meteor.startup(() =>{
   IniFileRepo();
   updateFileDB(repoDir);
 
-  var dirWatchDog = DirWatchDog();
   var fileServiceObj = {};
   fileServiceObj.reporDir = repoDir;
 
@@ -115,8 +115,6 @@ Meteor.startup(() =>{
     updateFileDB(repoDir);
   };
 
-  dirWatchDog.AddObserver(fileServiceObj);
-  dirWatchDog.StartMonitor(repoDir);
   console.log("\nFile service is running");
 });
 
