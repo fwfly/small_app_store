@@ -24,16 +24,29 @@ import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 import { Future } from 'fibers/future';
 import { AppDB }  from '../imports/api/appDB.js';
+import multer from 'multer'
 
 const testDB = new Mongo.Collection('testdb');
 var repoDir =  homedir + "/jenkins_util_repos";
+var storage = multer.diskStorage({
+        destination: function(req, file, cb){
+            cb(null, 'uploads/')
+        },
+        filename: function(req, file, cb){
+            console.log(file)
+            cb(null, file.originalname);
+        }
+    });
+
+var upload = multer({storage: storage});
+
 
 function IniFileRepo(){
   if(!fs.existsSync(repoDir)) {
     if(!fs.mkdirSync(repoDir)) {
       console.log("Error when creating folder");
     }
-  } 
+  }
 }
 
 // Update File List
@@ -128,7 +141,18 @@ const deployApp = function (params, req, res, next){
   res.write("{'success': 'hello' }");
   res.end();
 }
-  
+
+const uploadApp = function (params, req, res, next){
+
+    if (req.files !== undefined){
+        console.log("File uploading");
+    } else {
+        console.log("file not found");
+        console.log(req.headers);
+    }
+    res.end();
+
+}
 
 // http parser to get http body
 var bodyParser = Meteor.npmRequire('body-parser');
@@ -136,8 +160,10 @@ Picker.middleware(bodyParser.json());
 Picker.middleware(bodyParser.raw());
 Picker.middleware(bodyParser.text());
 Picker.middleware(bodyParser.urlencoded({extended: false}));
+Picker.middleware(upload.any());
 
 
 // Router download url
 Picker.route( '/dlapp/:_id', downloadFile);
 Picker.route('/deployApp', deployApp);
+Picker.route('/uploadapp', uploadApp);

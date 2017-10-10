@@ -5,15 +5,31 @@
     "start": "meteor run"
   },
   "dependencies": {
-    "babel-runtime": "^6.23.0",
-    "body-parser": "^1.17.1",
+    "babel-runtime": "^6.26.0",
+    "body-parser": "^1.18.2",
     "config-js": "^1.1.9",
     "fibers": "^1.0.15",
     "material-ui": "^0.17.0",
-    "meteor-node-stubs": "~0.2.0",
+    "meteor-node-stubs": "^0.2.11",
+    "multer": "^1.3.0",
     "react": "^15.4.2",
     "react-addons-pure-render-mixin": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-tap-event-plugin": "^2.0.1"
-  }
+  },
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fwfly/small_app_store.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fwfly/small_app_store/issues"
+  },
+  "homepage": "https://github.com/fwfly/small_app_store#readme",
+  "keywords": []
 }
