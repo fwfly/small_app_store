@@ -1,5 +1,5 @@
 "use strict";
-/**************************************************************************** 
+/****************************************************************************
  *   (c) Copyright 2016 Hewlett Packard Enterprise Development LP
  *   Licensed under the Apache License, Version 2.0 (the "License"); you may
  *   not use this file except in compliance with the License. You may obtain
@@ -11,7 +11,7 @@
  *   See the License for the specific language governing permissions and limitations
  *   under the License.
  *
- * File Name: fileservice.js 
+ * File Name: fileservice.js
  * Project: tools portal
  * Description:  file service is for tools portoal web site. Providing links for user download tools.
  *
@@ -26,8 +26,8 @@ import { Future } from 'fibers/future';
 import { AppDB }  from '../imports/api/appDB.js';
 import multer from 'multer'
 
-const testDB = new Mongo.Collection('testdb');
-var repoDir =  homedir + "/jenkins_util_repos";
+
+const repoDir =  homedir + "/jenkins_util_repos";
 var storage = multer.diskStorage({
         destination: function(req, file, cb){
             cb(null, 'uploads/')
@@ -37,7 +37,6 @@ var storage = multer.diskStorage({
             cb(null, file.originalname);
         }
     });
-
 var upload = multer({storage: storage});
 
 
@@ -49,55 +48,7 @@ function IniFileRepo(){
   }
 }
 
-// Update File List
-// scaning repository folder and creating file list. 
-function updateFileDB(path){
-    try{
-
-      var dbobj = {
-        name: "none",
-        idx: -1,
-        mt: "none",
-        description: "none",
-        version:"0.0.0",
-        author:"unknow",
-        size:"unknow"
-      };
-
-      //Clear DB
-      AppDB.remove({});
-      var files = fs.readdirSync(path);
-      var id = 0;
-      files.forEach(file => {
-        var filepath = path + "/" + file;
-
-        var syncStat = Meteor.wrapAsync(fs.lstat, fs);
-        syncStat(filepath, function(err, stats){
-          if(stats.isFile()) {
-            id = id+1;
-
-            dbobj.name = file;
-            dbobj.idx = id;
-            dbobj.description = file + " Grammarly's free writing app makes sure everything you type is easy to read, effective, and mistake-free. \nAdding Grammarly to Chrome means that your spelling and grammar will be vetted on Gmail, Facebook, Twitter, Linkedin, Tumblr, and nearly ";
-            dbobj.author = file + ", Cool"
-            dbobj.version="1.0.0"
-            // Get file size  and time.
-
-            AppDB.insert(dbobj);
-          }
-        });
-      });
- 
-    } catch (err) {
-      if( 'ENOENT' === err.code ) {
-        console.log('Folder not found');
-      } else {
-        throw err;
-      }
-    }
-}
-
-// handle http file request 
+// handle http file request
 const downloadFile = function (params, request, res, next) {
   var urls = request.url.split("/");
 
@@ -112,29 +63,24 @@ const downloadFile = function (params, request, res, next) {
 
   var filepath = repoDir + "/" + item.name;
   var filestream = fs.createReadStream(filepath);
-  filestream.pipe(res); 
+  filestream.pipe(res);
 }
-
-
-Meteor.startup(() =>{
-  //Initial
-  IniFileRepo();
-  updateFileDB(repoDir);
-
-  var fileServiceObj = {};
-  fileServiceObj.reporDir = repoDir;
-
-  fileServiceObj.update = function(filename){
-    updateFileDB(repoDir);
-  };
-
-  console.log("\nFile service is running");
-});
-
 
 const deployApp = function (params, req, res, next){
 
-  console.log(req.body);
+  var newApp = req.body;
+
+  let items = AppDB.find( {name: newApp['name']} ).fetch();
+  console.log(items);
+  if( 0 == items.length  ){
+    AppDB.insert(newApp);
+    console.log("Add an app" + newApp['name']);
+  } else {
+    AppDB.update({name: newApp['name']}, newApp);
+    console.log("Update an app" + newApp['name']);
+  }
+
+
   res.writeHead(200, {
     'Content-Type': 'application/json; charset=utf-8',
   });
@@ -153,6 +99,12 @@ const uploadApp = function (params, req, res, next){
     res.end();
 
 }
+
+Meteor.startup(() =>{
+  //Initial
+  IniFileRepo();
+});
+
 
 // http parser to get http body
 var bodyParser = Meteor.npmRequire('body-parser');
